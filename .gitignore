@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.instruckt/
+*.log
+test-results/
+playwright-report/
+tests/fixture/.astro/

@@ -1,0 +1,14 @@
+{
+  "name": "instruckt-astro-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.0.0",
+    "astro": "^5.0.0",
+    "instruckt-astro": "file:../.."
+  }
+}
