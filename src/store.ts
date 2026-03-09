@@ -40,8 +40,11 @@ export class Store {
     try {
       const data = await fs.readFile(ANNOTATIONS_FILE, "utf-8");
       return JSON.parse(data);
-    } catch {
-      return [];
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        return [];
+      }
+      throw error;
     }
   }
 
@@ -140,19 +143,34 @@ export class Store {
     return filename;
   }
 
+  static isValidFilename(filename: string): boolean {
+    return /^[A-Z0-9]{26}\.(png|svg)$/.test(filename);
+  }
+
   static async getScreenshot(filename: string): Promise<Buffer | null> {
+    if (!Store.isValidFilename(filename)) {
+      return null;
+    }
     try {
       return await fs.readFile(join(SCREENSHOTS_DIR, filename));
-    } catch {
-      return null;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        return null;
+      }
+      throw error;
     }
   }
 
   static async deleteScreenshot(filename: string): Promise<void> {
+    if (!Store.isValidFilename(filename)) {
+      return;
+    }
     try {
       await fs.unlink(join(SCREENSHOTS_DIR, filename));
-    } catch {
-      // Ignore if already deleted
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+        throw error;
+      }
     }
   }
 }

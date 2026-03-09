@@ -25,7 +25,7 @@ export interface InstrucktOptions {
 }
 
 const DEFAULT_CDN_URL =
-  "https://cdn.jsdelivr.net/npm/instruckt@0.4.21/dist/instruckt.iife.js";
+  "https://cdn.jsdelivr.net/npm/@sgasser88/instruckt@0.4.22/dist/instruckt.iife.js";
 
 export default function instruckt(
   options: InstrucktOptions = {},
@@ -119,7 +119,8 @@ export default function instruckt(
                 theme: '${resolvedOptions.theme}',
                 adapters: ${JSON.stringify(resolvedOptions.adapters)},
                 colors: ${JSON.stringify(resolvedOptions.colors)},
-                keys: ${JSON.stringify(resolvedOptions.keys)}
+                keys: ${JSON.stringify(resolvedOptions.keys)},
+                screenshotPath: '.instruckt/screenshots/'
               });
             }
             var s = document.createElement('script');

@@ -7,6 +7,28 @@ const UpdateSchema = z.object({
   comment: z.string().max(2000).optional(),
 });
 
+export const GET: APIRoute = async ({ params }) => {
+  const { id } = params;
+  if (!id) {
+    return new Response(JSON.stringify({ error: "Missing id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const annotation = await Store.getAnnotation(id);
+  if (!annotation) {
+    return new Response(JSON.stringify({ error: "Not found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  return new Response(JSON.stringify(annotation), {
+    headers: { "Content-Type": "application/json" },
+  });
+};
+
 export const PATCH: APIRoute = async ({ params, request }) => {
   const { id } = params;
   if (!id) {
