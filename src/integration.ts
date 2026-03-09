@@ -79,7 +79,7 @@ export default function instruckt(
           prerender: false,
         });
         injectRoute({
-          pattern: "/api/instruckt/screenshots/[filename]",
+          pattern: "/api/instruckt/[filename]",
           entrypoint: "instruckt-astro/dist/api/screenshots.js",
           prerender: false,
         });
