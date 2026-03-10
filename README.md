@@ -1,14 +1,16 @@
 # instruckt-astro
 
-Visual annotation feedback for AI coding agents in Astro. Enables users to annotate UI elements directly in the browser, which AI agents can then read and resolve via MCP.
+Visual annotation feedback for AI coding agents in Astro. Click on any UI element, leave feedback with optional screenshots, and let AI agents read and fix issues.
+
+![Annotate in browser → Paste into Claude Code](docs/hero.png)
 
 ## Installation
 
 ```bash
 bun add -D instruckt-astro
+# or: npm install -D instruckt-astro
+# or: pnpm add -D instruckt-astro
 ```
-
-## Configuration
 
 Add the integration to your Astro config:
 
@@ -22,7 +24,49 @@ export default defineConfig({
 });
 ```
 
-### Options
+Add MCP server to your project's `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "instruckt": {
+      "command": "npx",
+      "args": ["instruckt-mcp"],
+      "cwd": "/absolute/path/to/project"
+    }
+  }
+}
+```
+
+Add `.instruckt/` to your `.gitignore`:
+
+```
+.instruckt/
+```
+
+## Usage
+
+1. Run your Astro dev server
+2. Press `A` to enter annotation mode, click any element to annotate
+3. Press `C` to capture a region screenshot
+4. Annotations are auto-copied as markdown - paste into Claude Code
+5. Claude can view screenshots and mark issues resolved via MCP
+
+## MCP Tools
+
+Claude Code (or any MCP client) can use these tools to interact with annotations:
+
+- `instruckt_get_all_pending` - Get all pending annotations
+- `instruckt_get_screenshot` - Get base64-encoded screenshot for an annotation
+- `instruckt_resolve` - Mark an annotation as resolved
+
+## Dev Toolbar
+
+The integration adds an app to Astro's dev toolbar showing pending annotations. Click the chat bubble icon to view all annotations and navigate to annotated pages.
+
+## Configuration
+
+All options are optional. The defaults work for most projects:
 
 ```typescript
 instruckt({
@@ -41,49 +85,13 @@ instruckt({
     freeze: 'f',
     screenshot: 'c',
     clearPage: 'x'
-  },
-  cdnUrl: 'https://cdn.jsdelivr.net/npm/instruckt@0.4.21/dist/instruckt.iife.js'
+  }
 })
 ```
 
-## MCP Setup
-
-Add to your project's `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "instruckt": {
-      "command": "npx",
-      "args": ["instruckt-mcp"],
-      "cwd": "/absolute/path/to/project"
-    }
-  }
-}
-```
-
-## MCP Tools
-
-- `instruckt_get_all_pending` - Get all pending annotations
-- `instruckt_get_screenshot` - Get base64-encoded screenshot for an annotation
-- `instruckt_resolve` - Mark an annotation as resolved
-
-## Usage
-
-1. Run your Astro dev server
-2. Press 'A' to enter annotation mode
-3. Click on any element to annotate
-4. Add a comment and save
-5. Use Claude Code (or any MCP client) to read and resolve annotations
-
-## Dev Toolbar
-
-The integration adds an app to Astro's dev toolbar that shows pending annotations. Click the chat bubble icon in the toolbar to:
-- View all pending annotations
-- See annotation intent and severity
-- Navigate to annotated pages
-
 ## API Endpoints
+
+The integration exposes REST endpoints for custom integrations:
 
 - `GET /api/instruckt/annotations` - List all annotations
 - `POST /api/instruckt/annotations` - Create annotation
@@ -91,6 +99,8 @@ The integration adds an app to Astro's dev toolbar that shows pending annotation
 - `GET /api/instruckt/screenshots/[filename]` - Get screenshot image
 
 ## Development
+
+Contributing to instruckt-astro:
 
 ```bash
 bun install
@@ -100,14 +110,6 @@ bun run test:e2e    # Run E2E tests
 bun run test:all    # Run all tests
 ```
 
-## Storage
-
-Annotations are stored in `.instruckt/` in your project root. Add to `.gitignore`:
-
-```
-.instruckt/
-```
-
 ## Requirements
 
 - Astro 5.x (adapter auto-configured)
@@ -115,8 +117,6 @@ Annotations are stored in `.instruckt/` in your project root. Add to `.gitignore
 ## Credits
 
 This package is an Astro port of [instruckt-laravel](https://github.com/joshcirre/instruckt-laravel) by [Josh Cirre](https://github.com/joshcirre). It uses the [instruckt](https://github.com/joshcirre/instruckt) frontend library for the visual annotation UI.
-
-Thank you Josh for creating this excellent tool for AI-assisted development workflows.
 
 ## License
 
