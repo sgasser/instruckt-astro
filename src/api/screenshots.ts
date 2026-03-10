@@ -9,7 +9,7 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response("Not found", { status: 404 });
   }
 
-  const data = await Store.getScreenshot(filename);
+  const data = await Store.getScreenshotByFilename(filename);
   if (!data) {
     return new Response("Not found", { status: 404 });
   }

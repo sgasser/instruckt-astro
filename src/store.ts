@@ -64,16 +64,18 @@ export class Store {
     await Store.ensureDir();
 
     const now = new Date().toISOString();
+    const id = ulid();
     const annotation: Annotation = {
       ...data,
-      id: ulid(),
+      id,
       status: "pending",
       created_at: now,
       updated_at: now,
     };
 
     if (data.screenshot?.startsWith("data:")) {
-      annotation.screenshot = await Store.saveScreenshot(data.screenshot);
+      const saved = await Store.saveScreenshot(id, data.screenshot);
+      if (saved) annotation.screenshot = saved;
     }
 
     const all = await Store.getAllAnnotations();
@@ -114,15 +116,15 @@ export class Store {
     return annotation;
   }
 
-  static async saveScreenshot(dataUrl: string): Promise<string> {
+  static async saveScreenshot(id: string, dataUrl: string): Promise<string | null> {
     await Store.ensureDir();
 
     if (!dataUrl.startsWith("data:image/")) {
-      throw new Error("Invalid screenshot data URL");
+      return null;
     }
 
     const [header, data] = dataUrl.split(",", 2);
-    if (!data) throw new Error("Invalid screenshot data URL");
+    if (!data) return null;
 
     let binary: Buffer;
     let ext: string;
@@ -136,19 +138,38 @@ export class Store {
       ext = "svg";
     }
 
-    const filename = `${ulid()}.${ext}`;
+    if (!binary.length) return null;
+
+    // Use annotation ID as filename (matches Laravel)
+    const filename = `${id}.${ext}`;
     const filepath = join(SCREENSHOTS_DIR, filename);
 
     await fs.writeFile(filepath, binary);
-    return filename;
+    return `screenshots/${filename}`;
   }
 
-  static isValidFilename(filename: string): boolean {
-    return /^[A-Z0-9]{26}\.(png|svg)$/.test(filename);
+  static isValidScreenshotPath(path: string): boolean {
+    return /^screenshots\/[A-Z0-9]{26}\.(png|svg)$/.test(path);
   }
 
-  static async getScreenshot(filename: string): Promise<Buffer | null> {
-    if (!Store.isValidFilename(filename)) {
+  static async getScreenshotByPath(screenshotPath: string): Promise<Buffer | null> {
+    // Expects full path like "screenshots/01ABC.png" (matches Laravel)
+    if (!Store.isValidScreenshotPath(screenshotPath)) {
+      return null;
+    }
+    try {
+      return await fs.readFile(join(DATA_DIR, screenshotPath));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  static async getScreenshotByFilename(filename: string): Promise<Buffer | null> {
+    // Expects just filename like "01ABC.png" (for API route)
+    if (!/^[A-Z0-9]{26}\.(png|svg)$/.test(filename)) {
       return null;
     }
     try {
@@ -161,12 +182,13 @@ export class Store {
     }
   }
 
-  static async deleteScreenshot(filename: string): Promise<void> {
-    if (!Store.isValidFilename(filename)) {
+  static async deleteScreenshot(screenshotPath: string): Promise<void> {
+    // Expects full path like "screenshots/01ABC.png" (matches Laravel)
+    if (!Store.isValidScreenshotPath(screenshotPath)) {
       return;
     }
     try {
-      await fs.unlink(join(SCREENSHOTS_DIR, filename));
+      await fs.unlink(join(DATA_DIR, screenshotPath));
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw error;

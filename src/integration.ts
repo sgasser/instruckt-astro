@@ -79,7 +79,7 @@ export default function instruckt(
           prerender: false,
         });
         injectRoute({
-          pattern: "/api/instruckt/[filename]",
+          pattern: "/api/instruckt/screenshots/[filename]",
           entrypoint: "instruckt-astro/dist/api/screenshots.js",
           prerender: false,
         });
@@ -120,7 +120,7 @@ export default function instruckt(
                 adapters: ${JSON.stringify(resolvedOptions.adapters)},
                 colors: ${JSON.stringify(resolvedOptions.colors)},
                 keys: ${JSON.stringify(resolvedOptions.keys)},
-                screenshotPath: '.instruckt/screenshots/'
+                screenshotPath: '.instruckt/'
               });
             }
             var s = document.createElement('script');

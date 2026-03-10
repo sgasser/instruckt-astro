@@ -194,7 +194,7 @@ describe('Store', () => {
         severity: 'important' as const
       });
 
-      const data = await Store.getScreenshot(annotation.screenshot!);
+      const data = await Store.getScreenshotByPath(annotation.screenshot!);
       expect(data).not.toBeNull();
       expect(data).toBeInstanceOf(Buffer);
     });
@@ -214,10 +214,10 @@ describe('Store', () => {
         severity: 'important' as const
       });
 
-      const filename = annotation.screenshot!;
+      const screenshotPath = annotation.screenshot!;
       await Store.updateAnnotation(annotation.id, { status: 'resolved' });
 
-      const data = await Store.getScreenshot(filename);
+      const data = await Store.getScreenshotByPath(screenshotPath);
       expect(data).toBeNull();
     });
   });

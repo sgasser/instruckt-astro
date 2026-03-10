@@ -56,7 +56,7 @@ server.tool(
       };
     }
 
-    const data = await Store.getScreenshot(annotation.screenshot);
+    const data = await Store.getScreenshotByPath(annotation.screenshot);
     if (!data) {
       return {
         content: [
