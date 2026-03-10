@@ -116,7 +116,10 @@ export class Store {
     return annotation;
   }
 
-  static async saveScreenshot(id: string, dataUrl: string): Promise<string | null> {
+  static async saveScreenshot(
+    id: string,
+    dataUrl: string,
+  ): Promise<string | null> {
     await Store.ensureDir();
 
     if (!dataUrl.startsWith("data:image/")) {
@@ -152,7 +155,9 @@ export class Store {
     return /^screenshots\/[A-Z0-9]{26}\.(png|svg)$/.test(path);
   }
 
-  static async getScreenshotByPath(screenshotPath: string): Promise<Buffer | null> {
+  static async getScreenshotByPath(
+    screenshotPath: string,
+  ): Promise<Buffer | null> {
     // Expects full path like "screenshots/01ABC.png" (matches Laravel)
     if (!Store.isValidScreenshotPath(screenshotPath)) {
       return null;
@@ -167,7 +172,9 @@ export class Store {
     }
   }
 
-  static async getScreenshotByFilename(filename: string): Promise<Buffer | null> {
+  static async getScreenshotByFilename(
+    filename: string,
+  ): Promise<Buffer | null> {
     // Expects just filename like "01ABC.png" (for API route)
     if (!/^[A-Z0-9]{26}\.(png|svg)$/.test(filename)) {
       return null;
